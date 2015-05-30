@@ -2,14 +2,14 @@ import pxssh
 import time
 from threading import Thread
 
-class SSHHandler(object):
+class OMXPlayer(object):
     """
     Class to handle the ssh session used to control omxplayer
     """
-    KEY_UP = '\x1b[A'
-    KEY_DOWN = '\x1b[B'
-    KEY_RIGHT = '\x1b[C'
-    KEY_LEFT = '\x1b[D'
+    UP    = '\x1b[A'
+    DOWN  = '\x1b[B'
+    RIGHT = '\x1b[C'
+    LEFT  = '\x1b[D'
 
 
     def __init__(self,hostname,username,password=""):
@@ -34,18 +34,24 @@ class SSHHandler(object):
         self.session.sendline(" ")
 
     def f(self): # seek forward
-        self.session.sendline(SSHHandler.KEY_RIGHT)
+        self.session.sendline(OMXPlayer.RIGHT)
 
     def ff(self): # seek forward faster
-        self.session.sendline(SSHHandler.KEY_UP)
+        self.session.sendline(OMXPlayer.UP)
 
     def b(self): #seek backwards
-        self.session.sendline(SSHHandler.KEY_RIGHT)
+        self.session.sendline(OMXPlayer.RIGHT)
 
-    def bb(self):
-        self.session.sendline(SSHHandler.KEY_DOWN)
+        self.session.sendline(OMXPlayer.DOWN)
+
+    def volup(self):
+        self.session.sendline("+")
+
+    def voldown(self):
+        self.session.sendline("-")
 
     def close(self):
         self.session.sendline('\003') # send control-C
         time.sleep(2) # omxplayer time to close
         self.session.logout()
+
