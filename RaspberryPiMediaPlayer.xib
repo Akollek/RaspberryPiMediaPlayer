@@ -214,7 +214,7 @@
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eYw-vI-X6v">
                                             <rect key="frame" x="15" y="223" width="458" height="64"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" title="Currently playing:" id="EJv-y8-f6H">
+                                            <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" title="Nothing playing" id="EJv-y8-f6H">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>

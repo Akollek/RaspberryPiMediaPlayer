@@ -46,7 +46,7 @@ class RPiMediaPlayerController(NSWindowController):
         filename = self.filename.split("/")[-1].replace("\\","")
         while self.scp_handler.progress != 100:
             time.sleep(0.1)
-            message = "Uploading {filename} to {remote}...\nProgress: {p}%".format(
+            message = "Uploading {filename} to {remote}\nProgress: {p}%".format(
                                 filename=filename,
                                 remote=self.hostname,
                                 p=self.scp_handler.progress)
@@ -107,6 +107,7 @@ class RPiMediaPlayerController(NSWindowController):
     def stop_(self, sender):
         self.omxplayer.close()
         self.setPlayButtons(False)
+        self.nowPlayingField.setStringValue_("Nothing playing")
 
 
 if __name__=="__main__":

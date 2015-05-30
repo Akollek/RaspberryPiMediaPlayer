@@ -11,7 +11,5 @@ A python backed giu to play movies on your computer over a raspberry pi hooked u
 
 
 ### TODO:
-- Get volume controls working
-- Let users choose and scp a file over 
-- Error handling (cannot connect to the raspberry pi, file does not exist...)
+- Error handling (bad hostname, cannot connect to the raspberry pi, file does not exist...)
 
