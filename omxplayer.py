@@ -43,6 +43,7 @@ class OMXPlayer(object):
     def b(self): #seek backwards
         self.session.sendline(OMXPlayer.RIGHT)
 
+    def bb(seld):
         self.session.sendline(OMXPlayer.DOWN)
 
     def volup(self):
