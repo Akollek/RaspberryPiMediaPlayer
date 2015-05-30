@@ -1,26 +1,80 @@
 from Cocoa import *
 from Foundation import NSObject
 from PyObjCTools import AppHelper
+from scp_handler import SCPHandler
 from omxplayer import OMXPlayer
-import auth_info
+from threading import Thread
+import os, time
 
-class RPiMediaController(NSWindowController):
+class RPiMediaPlayerController(NSWindowController):
 
-    fileNameField = objc.IBOutlet()
+    hostnameField = objc.IBOutlet()
+    usernameField = objc.IBOutlet()
+    passwordField = objc.IBOutlet()
+    filenameField = objc.IBOutlet()
+    messageField  = objc.IBOutlet()
+    nowPlayingField = objc.IBOutlet()
 
-    def initiliaze(self, filename, hostname, username, password):
-        self.omxplayer = OMXPlayer(hostname, username, password)
-        self.filename = filename
+    playButton = objc.IBOutlet()
+    fButton    = objc.IBOutlet()
+    ffButton   = objc.IBOutlet()
+    bButton    = objc.IBOutlet()
+    bbButton   = objc.IBOutlet()
+    stopButton = objc.IBOutlet()
+    volupButton   = objc.IBOutlet()
+    voldownButton = objc.IBOutlet()
+
+    playButtons = (
+            'playButton',
+            'fButton',
+            'ffButton',
+            'bButton',
+            'bbButton',
+            'stopButton',
+            'volupButton',
+            'voldownButton',
+            )
+
+    def setPlayButtons(self,enable):
+        for button in self.playButtons:
+            eval('self.{}'.format(button)).setEnabled_(enable)
+
+    def scp_and_play(self):
+        self.scp_handler = SCPHandler(self.hostname,self.username,self.password)
+        self.remote_file = "/tmp/{}".format(self.filename.split("/")[-1])
+        self.scp_handler.scp(self.filename,self.remote_file)
+        filename = self.filename.split("/")[-1].replace("\\","")
+        while self.scp_handler.progress != 100:
+            time.sleep(0.1)
+            message = "Uploading {filename} to {remote}...\nProgress: {p}%".format(
+                                filename=filename,
+                                remote=self.hostname,
+                                p=self.scp_handler.progress)
+            self.messageField.setStringValue_(message)
+        
+        # start player
+        self.omxplayer = OMXPlayer(self.hostname, self.username, self.password)
+        self.omxplayer.play(self.remote_file)
+        self.nowPlayingField.setStringValue_("Currently Playing:\n{}".format(filename))
+        self.setPlayButtons(True)
 
     def windowDidLoad(self):
         NSWindowController.windowDidLoad(self)
-        self.omxplayer = OMXPlayer(auth_info.hostname, auth_info.username)
-        # temporary hard coding until I look into choosing a file
-        self.omxplayer.play('/home/pi/Video/Adventure\ Time\ -\ 413a\ -\ I\ Remember\ You\ \(PotentPotables\).mp4')
-        filename =self.omxplayer.filename.split("/")[-1].replace("\\","")
-        self.fileNameField.setStringValue_("Currently Playing:\n{}".format(filename))
-        print(self.fileNameField.stringValue())
+        self.setPlayButtons(False)
 
+    @objc.IBAction
+    def upload_(self, sender):
+        self.hostname = self.hostnameField.stringValue()
+        self.username = self.usernameField.stringValue()
+        self.password = self.passwordField.stringValue()
+        self.filename = self.filenameField.stringValue()
+        if not os.path.isfile(self.filename):
+            self.messageField.setStringValue_("File not found.")
+            return
+        scp_and_play_thread = Thread(target=self.scp_and_play, args=())
+        scp_and_play_thread.daemon = True
+        scp_and_play_thread.start()
+    
     @objc.IBAction
     def playpause_(self, sender):
         self.omxplayer.toggle_play()
@@ -52,13 +106,13 @@ class RPiMediaController(NSWindowController):
     @objc.IBAction
     def stop_(self, sender):
         self.omxplayer.close()
+        self.setPlayButtons(False)
 
 
 if __name__=="__main__":
     app = NSApplication.sharedApplication()
 
-    playerController = RPiMediaController.alloc().initWithWindowNibName_("RaspberryPiMediaPlayer")
-    
+    playerController = RPiMediaPlayerController.alloc().initWithWindowNibName_("RaspberryPiMediaPlayer") 
     playerController.showWindow_(playerController)
 
     NSApp.activateIgnoringOtherApps_(True)

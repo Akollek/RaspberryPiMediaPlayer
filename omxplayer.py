@@ -57,5 +57,6 @@ class OMXPlayer(object):
     def close(self):
         self.session.sendline('\003') # send control-C
         time.sleep(2) # give omxplayer time to close
+        self.session.sendline('rm {}'.format(self.filename))
         self.session.logout()
 

@@ -7,8 +7,8 @@ Usage:
 
 from setuptools import setup
 
-APP = ['RaspberryPiScp.py']
-DATA_FILES = ['RaspberryPiMediaScp.xib']
+APP = ['RaspberryPiMediaPlayer.py']
+DATA_FILES = ['RaspberryPiMediaPlayer.xib']
 OPTIONS = {'argv_emulation': True}
 
 setup(
