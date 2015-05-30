@@ -19,6 +19,7 @@ class OMXPlayer(object):
     
     def play(self, filename):
         self.filename = filename
+        self.volume = 0
         player_thread = Thread(target=self.player_daemon, args=())
         player_thread.daemon = True
         player_thread.start()
@@ -46,12 +47,14 @@ class OMXPlayer(object):
 
     def volup(self):
         self.session.sendline("+")
+        self.volume += 3 # omxplayer works in units of three dBs
 
     def voldown(self):
         self.session.sendline("-")
+        self.volume -= 3
 
     def close(self):
         self.session.sendline('\003') # send control-C
-        time.sleep(2) # omxplayer time to close
+        time.sleep(2) # give omxplayer time to close
         self.session.logout()
 

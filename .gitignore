@@ -1,9 +1,13 @@
-test_files/*
+test_files/
 venv/
+build/
+dist/
+.eggs/
+
+Application.xib
 auth_info.py
 
 *.pyc
-
 *.swp
 
 
