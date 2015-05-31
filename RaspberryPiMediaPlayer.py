@@ -4,7 +4,7 @@ from PyObjCTools import AppHelper
 from scp_handler import SCPHandler
 from omxplayer import OMXPlayer
 from threading import Thread
-import os, time
+import os, re, time
 
 
 def string_to_path(string):
@@ -14,7 +14,12 @@ def string_to_path(string):
         rstring = rstring.replace(c, '\\'+c)
     return rstring
 
+
 class RPiMediaPlayerController(NSWindowController):
+
+    audio_formats = ['mp3','mpa','flac','ogg','wav','wma','m4a']
+    video_formats = ['avi','wmv','mpg','mpeg','mp4','mkv','m4v','m2v','mpv','ogv','flv','mov'] 
+    media_patterns = re.compile(".*\.("+"|".join(audio_formats+video_formats)+")$", re.IGNORECASE)
 
     hostnameField = objc.IBOutlet()
     usernameField = objc.IBOutlet()
@@ -31,6 +36,8 @@ class RPiMediaPlayerController(NSWindowController):
     stopButton = objc.IBOutlet()
     volupButton   = objc.IBOutlet()
     voldownButton = objc.IBOutlet()
+    
+    uploadButton = objc.IBOutlet()
 
     playButtons = (
             'playButton',
@@ -62,11 +69,32 @@ class RPiMediaPlayerController(NSWindowController):
                                 p=self.scp_handler.progress)
             self.messageField.setStringValue_(message)
         
+        message = "Uploading {filename} to {remote}\nProgress: Done%".format(
+                                filename=filename,
+                                remote=self.hostname)
+       self.messageField.setStringValue_(message)
+        
         # start player
         self.omxplayer = OMXPlayer(self.hostname, self.username, self.password)
         self.omxplayer.play(self.remote_file)
         self.nowPlayingField.setStringValue_("Currently Playing:\n{}".format(filename))
         self.setPlayButtons(True)
+        player_status = Thread(target=self.player_status_daemon,args=())
+        player_status.daemon = True
+        player_status.start()
+
+    def player_status_daemon(self):
+        # poll for status of video
+        # (don't start polling until omxplayer has had some time to get started)
+        time.sleep(10)
+        while True:
+            if not self.omxplayer.playing:
+                break
+            time.sleep(2)
+        
+        self.setPlayButtons(False)
+        self.uploadButton.setEnabled_(True)
+        self.nowPlayingField.setStringValue_("Nothing playing")
 
     def windowDidLoad(self):
         NSWindowController.windowDidLoad(self)
@@ -81,8 +109,11 @@ class RPiMediaPlayerController(NSWindowController):
         if not os.path.isfile(self.filename):
             self.messageField.setStringValue_("File not found.")
             return
+        if not self.media_patterns.match(self.filename):
+            self.messageField.setStringValue_("Please only provide audio or video files")
+            return
+        self.uploadButton.setEnabled_(False)
         self.filename = string_to_path(self.filename)
-        print(self.filename)
         scp_and_play_thread = Thread(target=self.scp_and_play, args=())
         scp_and_play_thread.daemon = True
         scp_and_play_thread.start()
@@ -119,6 +150,7 @@ class RPiMediaPlayerController(NSWindowController):
     def stop_(self, sender):
         self.omxplayer.close()
         self.setPlayButtons(False)
+        self.uploadButton.setEnabled_(True)
         self.nowPlayingField.setStringValue_("Nothing playing")
 
 

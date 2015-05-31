@@ -30,6 +30,7 @@ class OMXPlayer(object):
         self.playing = True
         self.session.prompt()
         self.playing = False
+        self.close()
 
     def toggle_play(self):
         self.session.sendline(" ")

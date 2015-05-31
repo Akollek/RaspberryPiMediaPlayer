@@ -9,7 +9,10 @@ from setuptools import setup
 
 APP = ['RaspberryPiMediaPlayer.py']
 DATA_FILES = ['RaspberryPiMediaPlayer.xib']
-OPTIONS = {'argv_emulation': True}
+OPTIONS = {
+    'argv_emulation': True,
+    'packages' : ['pexpect']
+    }
 
 setup(
     app=APP,

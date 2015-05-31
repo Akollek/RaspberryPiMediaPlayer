@@ -17,6 +17,7 @@
                 <outlet property="passwordField" destination="QdA-kA-ehg" id="ZcZ-QH-nhk"/>
                 <outlet property="playButton" destination="mpE-xu-DVU" id="HSw-it-5GZ"/>
                 <outlet property="stopButton" destination="XnD-GV-wuW" id="iph-9N-QFk"/>
+                <outlet property="uploadButton" destination="6hw-gH-s7I" id="hcm-iZ-1j9"/>
                 <outlet property="usernameField" destination="AXg-nS-DTW" id="348-sa-gaq"/>
                 <outlet property="voldownButton" destination="WaM-Ca-OdN" id="4Q4-dF-KEK"/>
                 <outlet property="volupButton" destination="cOI-mW-JB8" id="9ZF-1Y-sQ8"/>
