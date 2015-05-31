@@ -72,7 +72,7 @@ class RPiMediaPlayerController(NSWindowController):
         message = "Uploading {filename} to {remote}\nProgress: Done%".format(
                                 filename=filename,
                                 remote=self.hostname)
-       self.messageField.setStringValue_(message)
+        self.messageField.setStringValue_(message)
         
         # start player
         self.omxplayer = OMXPlayer(self.hostname, self.username, self.password)
