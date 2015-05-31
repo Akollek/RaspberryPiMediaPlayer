@@ -12,6 +12,3 @@ Find the app at `dist/RaspberryPiMediaPlayer`.
 
 ### TODO:
 - Error handling (bad hostname, cannot connect to the raspberry pi)
-- Check filetypes and only accept video and audio
-- Disable upload button while playing media
-- Delete file and do a proper close when finished playing
