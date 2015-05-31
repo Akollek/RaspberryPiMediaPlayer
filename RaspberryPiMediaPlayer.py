@@ -6,6 +6,14 @@ from omxplayer import OMXPlayer
 from threading import Thread
 import os, time
 
+
+def string_to_path(string):
+    rstring = string
+    chars_to_escape = (' ', '(', ')', '[', ']', ':')
+    for c in chars_to_escape:
+        rstring = rstring.replace(c, '\\'+c)
+    return rstring
+
 class RPiMediaPlayerController(NSWindowController):
 
     hostnameField = objc.IBOutlet()
@@ -34,7 +42,7 @@ class RPiMediaPlayerController(NSWindowController):
             'volupButton',
             'voldownButton',
             )
-
+    
     def setPlayButtons(self,enable):
         for button in self.playButtons:
             eval('self.{}'.format(button)).setEnabled_(enable)
@@ -44,6 +52,8 @@ class RPiMediaPlayerController(NSWindowController):
         self.remote_file = "/tmp/{}".format(self.filename.split("/")[-1])
         self.scp_handler.scp(self.filename,self.remote_file)
         filename = self.filename.split("/")[-1].replace("\\","")
+        self.messageField.setStringValue_("Upload starting...")
+        time.sleep(0.5)
         while self.scp_handler.progress != 100:
             time.sleep(0.1)
             message = "Uploading {filename} to {remote}\nProgress: {p}%".format(
@@ -71,6 +81,8 @@ class RPiMediaPlayerController(NSWindowController):
         if not os.path.isfile(self.filename):
             self.messageField.setStringValue_("File not found.")
             return
+        self.filename = string_to_path(self.filename)
+        print(self.filename)
         scp_and_play_thread = Thread(target=self.scp_and_play, args=())
         scp_and_play_thread.daemon = True
         scp_and_play_thread.start()
