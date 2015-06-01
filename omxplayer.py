@@ -14,6 +14,7 @@ class OMXPlayer(object):
 
     def __init__(self,hostname,username,password=""):
         self.session = pxssh.pxssh()
+        self.session.timeout = None
         self.session.login(hostname,username,password)
         self.playing = False
     
@@ -25,12 +26,13 @@ class OMXPlayer(object):
         player_thread.start()
         
     def player_daemon(self):
+        self.playing = True
         command = "omxplayer -o hdmi {}".format(self.filename)
         self.session.sendline(command)
-        self.playing = True
-        self.session.prompt()
-        self.playing = False
-        self.close()
+        self.session.expect("have a nice day") # this is how omxplayer signs off
+        if self.playing:
+            self.playing = False
+            self.close()
 
     def toggle_play(self):
         self.session.sendline(" ")
@@ -56,6 +58,7 @@ class OMXPlayer(object):
         self.volume -= 3
 
     def close(self):
+        self.playing = False
         self.session.sendline('\003') # send control-C
         time.sleep(2) # give omxplayer time to close
         self.session.sendline('rm {}'.format(self.filename))

@@ -69,7 +69,7 @@ class RPiMediaPlayerController(NSWindowController):
                                 p=self.scp_handler.progress)
             self.messageField.setStringValue_(message)
         
-        message = "Uploading {filename} to {remote}\nProgress: Done%".format(
+        message = "Uploading {filename} to {remote}\nProgress: Done".format(
                                 filename=filename,
                                 remote=self.hostname)
         self.messageField.setStringValue_(message)
@@ -79,19 +79,14 @@ class RPiMediaPlayerController(NSWindowController):
         self.omxplayer.play(self.remote_file)
         self.nowPlayingField.setStringValue_("Currently Playing:\n{}".format(filename))
         self.setPlayButtons(True)
-        player_status = Thread(target=self.player_status_daemon,args=())
-        player_status.daemon = True
-        player_status.start()
 
-    def player_status_daemon(self):
         # poll for status of video
         # (don't start polling until omxplayer has had some time to get started)
         time.sleep(10)
-        while True:
-            if not self.omxplayer.playing:
-                break
-            time.sleep(2)
-        
+        while self.omxplayer.playing:
+            time.sleep(1)
+
+        # reset when playing is done
         self.setPlayButtons(False)
         self.uploadButton.setEnabled_(True)
         self.nowPlayingField.setStringValue_("Nothing playing")
